@@ -1,0 +1,30 @@
+{
+  "name": "create-dzn",
+  "version": "1.0.1",
+  "description": "generate backend entities instantly",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "lambda",
+    "dynamo",
+    "typescript",
+    "serverless",
+    "aws"
+  ],
+  "type": "module",
+  "author": "richi",
+  "license": "UNLICENSED",
+  "bin": {
+    "create-dzn": "cli/cliProject.js",
+    "new-dzn-entity": "cli/cliEntity.js"
+  },
+  "dependencies": {
+    "colorette": "^2.0.19",
+    "inquirer": "^9.1.4",
+    "yargs": "^17.6.2"
+  }
+}
