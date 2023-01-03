@@ -49,7 +49,12 @@ const handler = async ({ projectName }) => {
   }
   
   console.log(green("creating new project with the above settings... please wait"));
-  createNewProject(projectName);
+  try {
+    await createNewProject(projectName);
+  } catch (err) {
+    console.error(err.message);
+    process.exit()
+  }
 };
 
 yarg.command(

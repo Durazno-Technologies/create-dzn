@@ -16,11 +16,11 @@
 ### Installing
 
 * using npx  
-`npx create-dzn my-backend-project`
+`npx @durazno-technologies/create-dzn my-backend-project`
 * using npm  
-`npm init dzn my-backend-project`
+`npm init @durazno-technologies/dzn my-backend-project`
 * using npm also  
-`npm create dzn my-backend-project`
+`npm create @durazno-technologies/dzn my-backend-project`
 
 ### Create new entity
 
