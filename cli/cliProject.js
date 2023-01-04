@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { cyan, green, red } from 'colorette';
+import { cyan, cyanBright, green, greenBright, red } from 'colorette';
 import inquirer from 'inquirer';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
