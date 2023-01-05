@@ -8,7 +8,7 @@ import createNewEntity from "../entity.js";
 const yarg = yargs(hideBin(process.argv));
 
 // Yargs stored version number
-yarg.version('1.0.1');
+yarg.version('1.0.5');
 
 const validDataTypes = {
   string: true,
@@ -93,11 +93,12 @@ const handler = async ({ singularName, pluralName, properties }) => {
   }
   
   console.log(green("creating new entity with the above settings... please wait"));
-  createNewEntity(
-    'book',
-    'books',
-    'id:string;name:string;media?:string;published?:object'
-  );
+  try {
+    await createNewEntity(singularName, pluralName, properties);
+  } catch (err) {
+    console.error(err.message);
+    process.exit()
+  }
 };
 
 yarg.command(
