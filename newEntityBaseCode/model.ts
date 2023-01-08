@@ -1,5 +1,5 @@
-interface __SINGULAR_NAME__ {
-  
+// do not edit, properties managed by @durazno-technologies/create-dzn package
+interface __SINGLE_TITLE__ {
 }
 
-export default __SINGULAR_NAME__;
+export default __SINGLE_TITLE__;
