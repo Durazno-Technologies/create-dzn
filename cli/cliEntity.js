@@ -8,7 +8,7 @@ import createNewEntity from "../entity.js";
 const yarg = yargs(hideBin(process.argv));
 
 // Yargs stored version number
-yarg.version('1.0.5');
+yarg.version('1.0.8');
 
 const validDataTypes = {
   string: true,
@@ -67,7 +67,7 @@ const builder = (command) =>
       coerce: coarseString
     })
     .positional("properties", {
-      describe: 'Optional or required properties with names and datatypes. Example "id:number;name:string;married?:boolean"',
+      describe: 'Optional or required properties with names and datatypes. Example "id:string;age:number;married?:boolean"',
       coerce: coarseDataType
     });
 

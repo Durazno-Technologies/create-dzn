@@ -12,7 +12,7 @@ class __SINGLE_TITLE__Service {
     private readonly tableName: string,
   ) {}
 
-  async getAll__SINGLE_TITLE__(options: QueryOptions = { populate: false }): Promise<__SINGLE_TITLE__[]> {
+  async getAll__PLURAL_TITLE__(options: QueryOptions = { populate: false }): Promise<__SINGLE_TITLE__[]> {
     const results = await this.docClient
       .scan({
         TableName: this.tableName,

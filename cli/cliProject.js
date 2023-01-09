@@ -8,7 +8,7 @@ import createNewProject from "../project.js";
 const yarg = yargs(hideBin(process.argv));
 
 // Yargs stored version number
-yarg.version('1.0.5');
+yarg.version('1.0.8');
 
 const coarseString = text => {
   try {

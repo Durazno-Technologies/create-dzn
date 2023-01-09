@@ -3,6 +3,7 @@ import {
   Handler,
   APIGatewayProxyResult,
 } from "aws-lambda"
+import * as uuid from "uuid"
 import middyfy from "../../core/middyfy"
 import { formatJSONResponse } from "../../core/response"
 import { __SINGLE__Service } from "../../database/services"
@@ -15,8 +16,10 @@ export const handler: Handler = middyfy(
     event: APIGatewayEvent & Create__SINGLE_TITLE__,
   ): Promise<APIGatewayProxyResult> => {
     try {
+      const id: string = uuid.v4();
+      // the latter assignments always win
       const __SINGLE__ = await __SINGLE__Service
-        .create__SINGLE_TITLE__({ ...(event.body as __SINGLE_TITLE__) });
+        .create__SINGLE_TITLE__({ id, ...(event.body as __SINGLE_TITLE__) });
 
       return formatJSONResponse(201, __SINGLE__);
     } catch (err) {
