@@ -3,6 +3,8 @@ import { cyanBright, green, red, yellowBright, greenBright } from 'colorette';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
+import { load, dump } from 'js-yaml';
+import words from 'random-words';
 
 const myPathAsLibraryInsideNodeModules = dirname(
   fileURLToPath(import.meta.url),
@@ -156,6 +158,36 @@ export const __SINGLE__Service = new __SINGLE_TITLE__Service(createDynamoDBClien
     inlineReplacements: {},
     globalReplacements: true,
   },
+  functions: {
+    source: join(
+      myPathAsLibraryInsideNodeModules,
+      'newEntityBaseCode',
+      'functions.yml'
+    ),
+    dest: join(
+      originalUserDir,
+      'serverless',
+      '__SINGLE__',
+      'functions.yml',
+    ),
+    inlineReplacements: {},
+    globalReplacements: true,
+  },
+  resources: {
+    source: join(
+      myPathAsLibraryInsideNodeModules,
+      'newEntityBaseCode',
+      'resources.yml'
+    ),
+    dest: join(
+      originalUserDir,
+      'serverless',
+      '__SINGLE__',
+      'resources.yml',
+    ),
+    inlineReplacements: {},
+    globalReplacements: true,
+  },
 };
 
 const injectNewValues = (str, global = false) => str
@@ -181,33 +213,18 @@ const injectNewValues = (str, global = false) => str
   );
 
 const updateLocalValues = async (
-  singularName,
-  pluralName,
   properties,
 ) => new Promise(
   (resolve) => {
-    // change vars
-    templates.__SINGLE_TITLE__ = `${
-      singularName[0].toUpperCase()
-    }${
-      singularName.slice(1).toLowerCase()
-    }`;
-    templates.__PLURAL_TITLE__ = `${
-      pluralName[0].toUpperCase()
-    }${
-      pluralName.slice(1).toLowerCase()
-    }`;
-    templates.__SINGLE__ = singularName.toLowerCase();
-    templates.__PLURAL__ = pluralName.toLowerCase();
-    templates.__TABLE_NAME__ = `${pluralName.toUpperCase()}_TABLE`;
-    
     // apply changes to all files
     for (const keyFile in files) {
+      
       // step (1) READ
       let contents = readFileSync(
         files[keyFile].source,
-        { encoding: 'utf-8' }
+        { encoding: 'utf-8' },
       );
+      
       // step (2) REPLACE
       files[keyFile].dest = files[keyFile]
         .dest ? injectNewValues(files[keyFile].dest) : null;
@@ -226,6 +243,7 @@ const updateLocalValues = async (
       if (files[keyFile].globalReplacements) {
         contents = injectNewValues(contents, true);
       }
+      
       // step (3) WRITE
       if (!existsSync(dirname(files[keyFile].dest || files[keyFile].source))) {
         mkdirSync(
@@ -236,9 +254,11 @@ const updateLocalValues = async (
       writeFileSync(
         files[keyFile].dest || files[keyFile].source,
         contents,
-        { encoding: 'utf-8' }
+        { encoding: 'utf-8' },
       );
     }
+
+    // resolve promise
     resolve('success');
   }
 );
@@ -258,10 +278,114 @@ const generateSchema = async () => new Promise(
   }
 );
 
+const updateServerlessLocalValues = async () => new Promise(
+  (resolve) => {
+    console.log(`adding new entity configs to ${green('serverless.yml')}...`);
+    
+    // step (1) READ
+    const contents = load(readFileSync(
+      join(originalUserDir, 'serverless.yml'),
+      { encoding: 'utf-8' },
+    ));
+
+    // step (2) ADD NEW VALUES
+    contents.custom.dynamodb.seed.test.sources.push({
+      table: '${self:provider.environment.' + templates.__TABLE_NAME__ + '}',
+      sources: ['./test/' + templates.__PLURAL__ + '.json'],
+    })
+    contents.functions.push(
+      '${file(serverless/' + templates.__SINGLE__ + '/functions.yml)}'
+    );
+    contents.resources.push(
+      '${file(serverless/' + templates.__SINGLE__ + '/resources.yml)}'
+    );
+    contents.provider.environment[templates
+      .__TABLE_NAME__] = templates.__PLURAL__ + '-${self:provider.stage}';
+    contents.provider.iam.role.statements[0]
+      .Resource.push({
+        'Fn::GetAtt': [`${templates.__PLURAL_TITLE__}Table`, 'Arn'],
+      });
+
+    // step (3) WRITE
+    writeFileSync(
+      'serverless.copy.yml',
+      dump(contents),
+      { encoding: 'utf-8' },
+    );
+
+    // mark serverless.yml file as modified
+    files['serverless'] = { source: join(originalUserDir, 'serverless.yml') };
+
+    // resolve promise
+    resolve('success');
+  }
+);
+
+const randomValueOfDataType = (dataType) => {
+  switch (dataType) {
+    case 'string':
+      return words();
+    case 'number':
+      return Math.floor(Math.random() * 9999) + 333;
+    case 'boolean':
+      return Math.random() > 0.5;
+  }
+};
+
+const generateDummyDataForLocalDatabase = async (properties) => new Promise(
+  (resolve) => {
+    console.log(`adding new entity configs to ${green('serverless.yml')}...`);
+    
+    const dummy = [];
+
+    Array.from(Array(Math.floor(Math.random() * 7) + 3)).forEach((index) => {
+      const copy = Object.assign({}, properties);
+      for (const [key, value] of Object.entries(copy)) {
+        copy[key] = randomValueOfDataType(value.dataType);
+      }
+      dummy.push(copy);
+    });
+
+    writeFileSync(
+      join(originalUserDir, 'test', `${templates.__PLURAL__}.json`),
+      JSON.stringify(dummy, null, '\t'),
+      { encoding: 'utf-8' },
+    );
+
+    // mark generated file as new added file
+    files['dummyData'] = {
+      dest: join(originalUserDir, 'test', `${templates.__PLURAL__}.json`)
+    };
+
+    // resolve promise
+    resolve('success');
+  }
+);
+
 const createNewEntity = async (singularName, pluralName, properties) => {
   try {
-    await updateLocalValues(singularName, pluralName, properties);
+    // update template values
+    templates.__SINGLE_TITLE__ = `${
+      singularName[0].toUpperCase()
+    }${
+      singularName.slice(1).toLowerCase()
+    }`;
+    templates.__PLURAL_TITLE__ = `${
+      pluralName[0].toUpperCase()
+    }${
+      pluralName.slice(1).toLowerCase()
+    }`;
+    templates.__SINGLE__ = singularName.toLowerCase();
+    templates.__PLURAL__ = pluralName.toLowerCase();
+    templates.__TABLE_NAME__ = `${pluralName.toUpperCase()}_TABLE`;
+
+    // wait for processing functions to finish their heavy work
+    await updateLocalValues(properties);
     await generateSchema();
+    await updateServerlessLocalValues();
+    await generateDummyDataForLocalDatabase(properties);
+
+    // display success info
     console.log(
       green(`new entity ${cyanBright(singularName)} was created`),
       green("\n\nthese files were modified in your project"),

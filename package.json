@@ -8,6 +8,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Durazno-Technologies/create-dzn.git"
+  },
   "keywords": [
     "lambda",
     "dynamo",
@@ -25,6 +29,8 @@
   "dependencies": {
     "colorette": "^2.0.19",
     "inquirer": "^9.1.4",
+    "js-yaml": "^4.1.0",
+    "random-words": "^1.2.1",
     "yargs": "^17.6.2"
   }
 }

@@ -1,0 +1,14 @@
+Resources:
+  __PLURAL_TITLE__Table:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:provider.environment.__TABLE_NAME__}
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1

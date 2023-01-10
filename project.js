@@ -57,8 +57,7 @@ const updateLocalValues = async (projectName) => new Promise(
     contents = contents.replace(/richi/, userInfo().username);
     writeFileSync('package.json', contents, { encoding: 'utf-8' });
     contents = readFileSync('serverless.yml', { encoding: 'utf-8' });
-    contents = contents.replace(/book-quote/, projectName);
-    contents = contents.replace(/bookQuote/, projectName);
+    contents = contents.replace(/book-quote/g, projectName);
     writeFileSync('serverless.yml', contents, { encoding: 'utf-8' });
     resolve();
   }

@@ -1,0 +1,40 @@
+create__SINGLE_TITLE__:
+  handler: src/functions/__SINGLE__/create__SINGLE_TITLE__.handler
+  events:
+    - http:
+        method: post
+        path: __SINGLE__
+        cors: true
+        private: true
+getAll__PLURAL_TITLE__:
+  handler: src/functions/__SINGLE__/getAll__PLURAL_TITLE__.handler
+  events:
+    - http:
+        method: get
+        path: __SINGLE__
+        cors: true
+        private: true
+get__SINGLE_TITLE__:
+  handler: src/functions/__SINGLE__/get__SINGLE_TITLE__.handler
+  events:
+    - http:
+        method: get
+        path: __SINGLE__/{id}
+        cors: true
+        private: true
+update__SINGLE_TITLE__:
+  handler: src/functions/__SINGLE__/update__SINGLE_TITLE__.handler
+  events:
+    - http:
+        method: put
+        path: __SINGLE__/{id}
+        cors: true
+        private: true
+delete__SINGLE_TITLE__:
+  handler: src/functions/__SINGLE__/delete__SINGLE_TITLE__.handler
+  events:
+    - http:
+        method: delete
+        path: __SINGLE__/{id}
+        cors: true
+        private: true

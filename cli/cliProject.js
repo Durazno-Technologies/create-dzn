@@ -4,23 +4,12 @@ import inquirer from 'inquirer';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import createNewProject from "../project.js";
+import { questionContinue, versionNumber, coarseString } from "./comoon.js";
 
 const yarg = yargs(hideBin(process.argv));
 
 // Yargs stored version number
-yarg.version('1.0.8');
-
-const coarseString = text => {
-  try {
-    const value = text.toString();
-    if (value.length > 0) {
-      return value;
-    }
-  } catch (err) {
-    console.error(err.message);
-  }
-  throw new Error(red("param cannot be empty"));
-}
+yarg.version(versionNumber);
 
 const builder = (command) =>
   command
@@ -31,16 +20,6 @@ const builder = (command) =>
 
 const handler = async ({ projectName }) => {
   console.log(cyan("your new project name is"), projectName);
-
-  const questionContinue = [
-    {
-        type: 'confirm',
-        name: 'canContinue',
-        message: 'Are you happy with these settings?',
-        default: true
-    }
-  ];
-  
   const answer = await inquirer.prompt(questionContinue);
   
   if(!answer.canContinue) {
