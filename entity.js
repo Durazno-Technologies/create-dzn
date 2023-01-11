@@ -231,7 +231,7 @@ const updateLocalValues = async (
       if (files[keyFile].injectProperties) {
         const myProps = Object.keys(properties)
           .map(property => `  ${property}${
-            properties[property].required ? '?' : ''
+            properties[property].required ? '' : '?'
           }: ${properties[property].dataType};`);
         myProps.push('}');
         files[keyFile].inlineReplacements['}'] = myProps.join('\n');
@@ -308,7 +308,7 @@ const updateServerlessLocalValues = async () => new Promise(
 
     // step (3) WRITE
     writeFileSync(
-      'serverless.copy.yml',
+      'serverless.yml',
       dump(contents),
       { encoding: 'utf-8' },
     );
@@ -334,7 +334,7 @@ const randomValueOfDataType = (dataType) => {
 
 const generateDummyDataForLocalDatabase = async (properties) => new Promise(
   (resolve) => {
-    console.log(`adding new entity configs to ${green('serverless.yml')}...`);
+    console.log(`generating dummy data for local database`);
     
     const dummy = [];
 
