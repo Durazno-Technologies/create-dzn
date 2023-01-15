@@ -3,7 +3,7 @@ create__SINGLE_TITLE__:
   events:
     - http:
         method: post
-        path: __SINGLE__
+        path: __PLURAL__
         cors: true
         private: true
 getAll__PLURAL_TITLE__:
@@ -11,7 +11,7 @@ getAll__PLURAL_TITLE__:
   events:
     - http:
         method: get
-        path: __SINGLE__
+        path: __PLURAL__
         cors: true
         private: true
 get__SINGLE_TITLE__:
@@ -19,7 +19,7 @@ get__SINGLE_TITLE__:
   events:
     - http:
         method: get
-        path: __SINGLE__/{id}
+        path: __PLURAL__/{id}
         cors: true
         private: true
 update__SINGLE_TITLE__:
@@ -27,7 +27,7 @@ update__SINGLE_TITLE__:
   events:
     - http:
         method: put
-        path: __SINGLE__/{id}
+        path: __PLURAL__/{id}
         cors: true
         private: true
 delete__SINGLE_TITLE__:
@@ -35,6 +35,6 @@ delete__SINGLE_TITLE__:
   events:
     - http:
         method: delete
-        path: __SINGLE__/{id}
+        path: __PLURAL__/{id}
         cors: true
         private: true

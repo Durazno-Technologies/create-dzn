@@ -1,11 +1,31 @@
 import { cyanBright, red, magentaBright, green, greenBright } from 'colorette';
-import { join } from 'path';
+import { dirname, join } from 'path';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { spawn } from 'child_process';
 import { userInfo } from 'os';
+import { dump } from 'js-yaml';
+import { fileURLToPath } from 'url';
+import { templates, updateLocalValues } from './utils.js';
 
 const duraznoBackendSeed = 'git@github.com:Durazno-Technologies/durazno-backend-seed.git';
 const originalUserDir = process.cwd();
+
+const myPathAsLibraryInsideNodeModules = dirname(
+  fileURLToPath(import.meta.url),
+);
+
+const files = {
+  insomniaProjectYaml: {
+    source: join(
+      myPathAsLibraryInsideNodeModules,
+      'newEntityBaseCode',
+      'project.yaml'
+    ),
+    dest: null,
+    inlineReplacements: {},
+    globalReplacements: true,
+  },
+};
 
 const downloadFromGitHub = async (projectName) => new Promise(
   (resolve) => {
@@ -49,17 +69,66 @@ const installDependencies = async () => new Promise(
   }
 );
 
-const updateLocalValues = async (projectName) => new Promise(
+const updateConfigFiles = async (projectName) => new Promise(
   (resolve) => {
-    console.log('updating local values...');
+    console.log(
+      'updating values inside package.json and serverless.yml files',
+    );
+    
+    // update package.json file
     let contents = readFileSync('package.json', { encoding: 'utf-8' });
     contents = contents.replace(/durazno-backend-seed/, projectName);
     contents = contents.replace(/richi/, userInfo().username);
     writeFileSync('package.json', contents, { encoding: 'utf-8' });
+
+    // update serverless.yml file
     contents = readFileSync('serverless.yml', { encoding: 'utf-8' });
     contents = contents.replace(/book-quote/g, projectName);
     writeFileSync('serverless.yml', contents, { encoding: 'utf-8' });
-    resolve();
+
+    // resolve promise
+    resolve('success');
+  }
+);
+
+const generateInsomniaProjectFile = async (projectName) => new Promise(
+  async (resolve) => {
+    
+    // write to settings file the generated values
+    const mySettings = {
+      __PROJECT_NAME__: `${
+        projectName[0].toUpperCase()
+      }${
+        projectName.slice(1).toLowerCase()
+      }`,
+      __KEY_PAIR_UUID__: templates.__KEY_PAIR_UUID__,
+      __API_SPEC_UUID__: templates.__API_SPEC_UUID__,
+      __LOCAL_ENV_UUID__: templates.__LOCAL_ENV_UUID__,
+      __AMAZON_ENV_UUID__: templates.__AMAZON_ENV_UUID__,
+      __ENVIRONMENT_UUID__: templates.__ENVIRONMENT_UUID__,
+      __WORKSPACE_UUID__: templates.__WORKSPACE_UUID__,
+    };
+    writeFileSync(
+      'settings.yml',
+      dump(mySettings),
+      { encoding: 'utf-8' },
+    );
+
+    // inject and override extracted settings into templates values
+    for (const key in mySettings) {
+      templates[key] = mySettings[key];
+    }
+    
+    // update template values
+    files.insomniaProjectYaml.dest = join(
+      originalUserDir,
+      projectName,
+      'insomnia__PROJECT_NAME__Project.yml',
+    )
+    await updateLocalValues(null, files);
+
+    // resolve promise
+    resolve('success');
   }
 );
 
@@ -68,7 +137,8 @@ const createNewProject = async (projectName) => {
     await downloadFromGitHub(projectName);
     process.chdir(projectName);
     await installDependencies();
-    await updateLocalValues(projectName);
+    await updateConfigFiles(projectName);
+    await generateInsomniaProjectFile(projectName);
     process.chdir(originalUserDir);
     console.log(
       green("new folder was created within folder"),

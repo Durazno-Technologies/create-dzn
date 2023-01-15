@@ -1,0 +1,190 @@
+_type: export
+__export_format: 4
+__export_date: __FULL_DATE__
+__export_source: insomnia.desktop.app:v2022.7.1
+resources:
+  - _id: __WORKSPACE_UUID__
+    parentId: null
+    modified: __EPOCH_PLUS_ONE__
+    created: __EPOCH_TIME__
+    name: __PROJECT_NAME__
+    description: ""
+    scope: collection
+    _type: workspace
+  - _id: __ENVIRONMENT_UUID__
+    parentId: __WORKSPACE_UUID__
+    modified: __EPOCH_PLUS_ONE__
+    created: __EPOCH_TIME__
+    name: Base Environment
+    data: {}
+    dataPropertyOrder: null
+    color: null
+    isPrivate: false
+    metaSortKey: -358000000
+    _type: environment
+  - _id: __API_SPEC_UUID__
+    parentId: __WORKSPACE_UUID__
+    modified: __EPOCH_PLUS_ONE__
+    created: __EPOCH_TIME__
+    fileName: __PROJECT_NAME__
+    contents: ""
+    contentType: yaml
+    _type: api_spec
+  - _id: __REQUEST_GROUP_UUID__
+    parentId: __WORKSPACE_UUID__
+    modified: __EPOCH_PLUS_ONE__
+    created: __EPOCH_TIME__
+    name: __SINGLE_TITLE__
+    description: ""
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -971000000
+    _type: request_group
+  - _id: __REQUEST_POST_UUID__
+    parentId: __REQUEST_GROUP_UUID__
+    modified: __EPOCH_PLUS_ONE__
+    created: __EPOCH_TIME__
+    url: "{{ _.amazonURL }}/{{ _.stage }}/__PLURAL__"
+    name: __SINGLE_TITLE__
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: >-
+        {
+        	"name": "Elizabeth",
+        	"city": "Medellin",
+        	"age": 23,
+        	"description": "Me encanta bailar salsa",
+        	"activities": ["d92b4a14-def9-4df9-91f3-6b2e021c0d36"],
+        	"phone": "5544623411",
+        	"email": "eli.medallo@gmail.com"
+        }
+    parameters: []
+    headers:
+      - id: __KEY_PAIR_UUID__
+        name: x-api-key
+        value: "{{ _.apiKey }}"
+        description: ""
+      - name: Content-Type
+        value: application/json
+    authentication: {}
+    metaSortKey: -651000000
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: __REQUEST_PUT_UUID__
+    parentId: __REQUEST_GROUP_UUID__
+    modified: __EPOCH_PLUS_ONE__
+    created: __EPOCH_TIME__
+    url: "{{ _.amazonURL }}/{{ _.stage
+      }}/__PLURAL__/my-id"
+    name: __SINGLE_TITLE__
+    description: ""
+    method: PUT
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"phone": "552362231",
+        	"email": "geral.medallo@gmail.com"
+        }
+    parameters: []
+    headers:
+      - id: __KEY_PAIR_UUID__
+        name: x-api-key
+        value: "{{ _.apiKey }}"
+        description: ""
+      - name: Content-Type
+        value: application/json
+    authentication: {}
+    metaSortKey: -807000000
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: __REQUEST_GETALL_UUID__
+    parentId: __REQUEST_GROUP_UUID__
+    modified: __EPOCH_PLUS_ONE__
+    created: __EPOCH_TIME__
+    url: "{{ _.amazonURL }}/{{ _.stage }}/__PLURAL__"
+    name: All __PLURAL_TITLE__
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers:
+      - id: __KEY_PAIR_UUID__
+        name: x-api-key
+        value: "{{ _.apiKey }}"
+        description: ""
+    authentication: {}
+    metaSortKey: -132000000
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: __REQUEST_GET_UUID__
+    parentId: __REQUEST_GROUP_UUID__
+    modified: __EPOCH_PLUS_ONE__
+    created: __EPOCH_TIME__
+    url: "{{ _.amazonURL }}/{{ _.stage
+      }}/__PLURAL__/my-id"
+    name: __SINGLE_TITLE__ ID
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers:
+      - id: __KEY_PAIR_UUID__
+        name: x-api-key
+        value: "{{ _.apiKey }}"
+        description: ""
+    authentication: {}
+    metaSortKey: -873000000
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: __REQUEST_DELETE_UUID__
+    parentId: __REQUEST_GROUP_UUID__
+    modified: __EPOCH_PLUS_ONE__
+    created: __EPOCH_TIME__
+    url: "{{ _.amazonURL }}/{{ _.stage }}/__PLURAL__/my-id"
+    name: __SINGLE_TITLE__ ID
+    description: ""
+    method: DELETE
+    body: {}
+    parameters: []
+    headers:
+      - id: __KEY_PAIR_UUID__
+        name: x-api-key
+        value: "{{ _.apiKey }}"
+        description: ""
+    authentication: {}
+    metaSortKey: -803000000
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request

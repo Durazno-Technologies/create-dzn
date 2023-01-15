@@ -1,22 +1,16 @@
 import { spawn } from 'child_process';
 import { cyanBright, green, red, yellowBright, greenBright } from 'colorette';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { load, dump } from 'js-yaml';
 import words from 'random-words';
+import { templates, updateLocalValues } from './utils.js';
 
 const myPathAsLibraryInsideNodeModules = dirname(
   fileURLToPath(import.meta.url),
 );
 const originalUserDir = process.cwd();
-const templates = {
-  __SINGLE_TITLE__: '',
-  __PLURAL_TITLE__: '',
-  __SINGLE__: '',
-  __PLURAL__: '',
-  __TABLE_NAME__: '',
-};
 const files = {
   databaseIndexService: {
     source: join(originalUserDir, 'src', 'database', 'services', 'index.ts'),
@@ -188,80 +182,22 @@ export const __SINGLE__Service = new __SINGLE_TITLE__Service(createDynamoDBClien
     inlineReplacements: {},
     globalReplacements: true,
   },
+  insomniaEntityYaml: {
+    source: join(
+      myPathAsLibraryInsideNodeModules,
+      'newEntityBaseCode',
+      'entity.yaml'
+    ),
+    dest: join(
+      originalUserDir,
+      'serverless',
+      '__SINGLE__',
+      'insomnia.yml',
+    ),
+    inlineReplacements: {},
+    globalReplacements: true,
+  },
 };
-
-const injectNewValues = (str, global = false) => str
-  .replace(
-    new RegExp('__SINGLE_TITLE__', global ? 'g' : ''),
-    templates.__SINGLE_TITLE__,
-  )
-  .replace(
-    new RegExp('__PLURAL_TITLE__', global ? 'g' : ''),
-    templates.__PLURAL_TITLE__,
-  )
-  .replace(
-    new RegExp('__SINGLE__', global ? 'g' : ''),
-    templates.__SINGLE__,
-  )
-  .replace(
-    new RegExp('__PLURAL__', global ? 'g' : ''),
-    templates.__PLURAL__,
-  )
-  .replace(
-    new RegExp('__TABLE_NAME__', global ? 'g' : ''),
-    templates.__TABLE_NAME__,
-  );
-
-const updateLocalValues = async (
-  properties,
-) => new Promise(
-  (resolve) => {
-    // apply changes to all files
-    for (const keyFile in files) {
-      
-      // step (1) READ
-      let contents = readFileSync(
-        files[keyFile].source,
-        { encoding: 'utf-8' },
-      );
-      
-      // step (2) REPLACE
-      files[keyFile].dest = files[keyFile]
-        .dest ? injectNewValues(files[keyFile].dest) : null;
-      if (files[keyFile].injectProperties) {
-        const myProps = Object.keys(properties)
-          .map(property => `  ${property}${
-            properties[property].required ? '' : '?'
-          }: ${properties[property].dataType};`);
-        myProps.push('}');
-        files[keyFile].inlineReplacements['}'] = myProps.join('\n');
-      }
-      for (const [key, val] of Object
-        .entries(files[keyFile].inlineReplacements)) {
-          contents = contents.replace(key, injectNewValues(val));
-      }
-      if (files[keyFile].globalReplacements) {
-        contents = injectNewValues(contents, true);
-      }
-      
-      // step (3) WRITE
-      if (!existsSync(dirname(files[keyFile].dest || files[keyFile].source))) {
-        mkdirSync(
-          dirname(files[keyFile].dest || files[keyFile].source),
-          { recursive: true }
-        );
-      }
-      writeFileSync(
-        files[keyFile].dest || files[keyFile].source,
-        contents,
-        { encoding: 'utf-8' },
-      );
-    }
-
-    // resolve promise
-    resolve('success');
-  }
-);
 
 const generateSchema = async () => new Promise(
   (resolve) => {
@@ -364,6 +300,19 @@ const generateDummyDataForLocalDatabase = async (properties) => new Promise(
 
 const createNewEntity = async (singularName, pluralName, properties) => {
   try {
+    let mySettings;
+    if (existsSync(join(originalUserDir, 'settings.yml'))) {
+      mySettings = load(readFileSync(
+        join(originalUserDir, 'settings.yml'),
+        { encoding: 'utf-8' },
+      ));
+
+      // inject and override extracted settings into templates values
+      for (const key in mySettings) {
+        templates[key] = mySettings[key];
+      }
+    }
+    
     // update template values
     templates.__SINGLE_TITLE__ = `${
       singularName[0].toUpperCase()
@@ -380,7 +329,7 @@ const createNewEntity = async (singularName, pluralName, properties) => {
     templates.__TABLE_NAME__ = `${pluralName.toUpperCase()}_TABLE`;
 
     // wait for processing functions to finish their heavy work
-    await updateLocalValues(properties);
+    await updateLocalValues(properties, files);
     await generateSchema();
     await updateServerlessLocalValues();
     await generateDummyDataForLocalDatabase(properties);
