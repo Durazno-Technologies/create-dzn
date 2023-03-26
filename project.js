@@ -46,7 +46,7 @@ const downloadFromGitHub = async (projectName) => new Promise(
   }
 );
 
-const installDependencies = async () => new Promise(
+const installDependencies = async (options) => new Promise(
   (resolve) => {
     console.log('installing dependencies...');
     const npmi = spawn('npm', ['install'], { timeout: 60 * 5 * 1000 });
@@ -56,15 +56,20 @@ const installDependencies = async () => new Promise(
       if (code !== 0) {
         throw new Error(`${greenBright('npm')} failed with error code ${code}`);
       }
-      const dynamo = spawn('npx', ['sls', 'dynamodb', 'install'], { timeout: 60 * 5 * 1000});
-      dynamo.stdout.on('data', (data) => process.stdout.write(data.toString()));
-      dynamo.stderr.on('data', (data) => process.stdout.write(data.toString()));
-      dynamo.on('close', (code) => {
-        if (code !== 0) {
-          throw new Error(`${greenBright('dynamo')} failed with error code ${code}`);
-        }
+
+      if (options.installLocalDynamoDB) {
+        const dynamo = spawn('npx', ['sls', 'dynamodb', 'install'], { timeout: 60 * 5 * 1000});
+        dynamo.stdout.on('data', (data) => process.stdout.write(data.toString()));
+        dynamo.stderr.on('data', (data) => process.stdout.write(data.toString()));
+        dynamo.on('close', (code) => {
+          if (code !== 0) {
+            throw new Error(`${greenBright('dynamo')} failed with error code ${code}`);
+          }
+          resolve(code);
+        });
+      } else {
         resolve(code);
-      });
+      }
     });
   }
 );
@@ -132,11 +137,11 @@ const generateInsomniaProjectFile = async (projectName) => new Promise(
   }
 );
 
-const createNewProject = async (projectName) => {
+const createNewProject = async (projectName, options) => {
   try {
     await downloadFromGitHub(projectName);
     process.chdir(projectName);
-    await installDependencies();
+    await installDependencies(options);
     await updateConfigFiles(projectName);
     await generateInsomniaProjectFile(projectName);
     process.chdir(originalUserDir);

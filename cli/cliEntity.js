@@ -19,16 +19,19 @@ yarg.version(versionNumber);
 const builder = (command) =>
   command
     .positional("singularName", {
-      describe: "Entity singular name. Example woman",
-      coerce: coarseString
+      describe: "Entity singular name",
+      coerce: coarseString,
+      default: 'woman',
     })
     .positional("pluralName", {
-      describe: "Entity plural name. Example women",
-      coerce: coarseString
+      describe: "Entity plural name",
+      coerce: coarseString,
+      default: 'women',
     })
     .positional("properties", {
-      describe: 'Optional or required properties with names and datatypes. Example "id:string;age:number;married?:boolean"',
-      coerce: coarseDataType
+      describe: 'Properties with types',
+      coerce: coarseDataType,
+      default: "id:string;married?:boolean",
     });
 
 const handler = async ({ singularName, pluralName, properties }) => {

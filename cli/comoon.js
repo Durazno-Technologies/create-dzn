@@ -1,3 +1,5 @@
+import { red } from 'colorette';
+
 export const versionNumber = '1.0.8';
 
 export const questionContinue = [

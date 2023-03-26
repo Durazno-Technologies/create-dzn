@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { cyan, cyanBright, green, greenBright, red } from 'colorette';
+import { cyan, green, red } from 'colorette';
 import inquirer from 'inquirer';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
@@ -16,10 +16,16 @@ const builder = (command) =>
     .positional("projectName", {
       describe: "The name of your backend new project",
       coerce: coarseString
+    })
+    .option('localDynamoDB', {
+      require: false,
+      describe: "install a local dynamodb instance",
+      default: false,
     });
 
-const handler = async ({ projectName }) => {
+const handler = async ({ projectName, localDynamoDB }) => {
   console.log(cyan("your new project name is"), projectName);
+  console.log(cyan("Install Local DynamoDB?"), localDynamoDB ? 'Yes' : 'No');
   const answer = await inquirer.prompt(questionContinue);
   
   if(!answer.canContinue) {
@@ -28,8 +34,13 @@ const handler = async ({ projectName }) => {
   }
   
   console.log(green("creating new project with the above settings... please wait"));
+
+  const options = {
+    installLocalDynamoDB: localDynamoDB,
+  };
+
   try {
-    await createNewProject(projectName);
+    await createNewProject(projectName, options);
   } catch (err) {
     console.error(err.message);
     process.exit()
@@ -37,7 +48,7 @@ const handler = async ({ projectName }) => {
 };
 
 yarg.command(
-  "* <projectName>",
+  "* <projectName> [localDynamoDB]",
   false,
   builder,
   handler,
