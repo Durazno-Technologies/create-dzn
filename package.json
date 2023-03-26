@@ -1,6 +1,6 @@
 {
   "name": "@durazno-technologies/create-dzn",
-  "version": "1.0.12",
+  "version": "1.1.0",
   "description": "generate backend entities instantly",
   "engines": {
     "node": ">=18"
